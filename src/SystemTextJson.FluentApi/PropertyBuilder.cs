@@ -48,15 +48,21 @@ public class PropertyBuilder<TEntity, TProperty>(string propertyName, EntityType
         return this;
     }
 
-    public PropertyBuilder<TEntity, TProperty> HasObjectCreationHandling(JsonObjectCreationHandling objectCreationHandling)
+    public PropertyBuilder<TEntity, TProperty> IsPopulated()
     {
-        Configure(p => p.ObjectCreationHandling = objectCreationHandling);
+        Configure(p => p.ObjectCreationHandling = JsonObjectCreationHandling.Populate);
         return this;
     }
 
     public PropertyBuilder<TEntity, TProperty> HasOrder(int order)
     {
         Configure(p => p.Order = order);
+        return this;
+    }
+
+    public PropertyBuilder<TEntity, TProperty> IsRequired()
+    {
+        Configure(p => p.IsRequired = true);
         return this;
     }
 

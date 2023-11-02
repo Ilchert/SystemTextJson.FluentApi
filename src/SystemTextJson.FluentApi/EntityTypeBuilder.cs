@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
 namespace SystemTextJson.FluentApi;
@@ -27,20 +28,26 @@ public sealed class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : 
         return newBuilder;
     }
 
-    public EntityTypeBuilder<TEntity> Ignore<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
+    public EntityTypeBuilder<TEntity> IgnoreProperty<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
     {
         var propertyName = GetPropertyName(propertyExpression);
         Configure(p =>
         {
             for (var i = 0; i < p.Properties.Count; i++)
             {
-                if (CompareNames(p.Properties[i], propertyName))
+                if (p.Properties[i].GetMemberName() == propertyName)
                 {
                     p.Properties.RemoveAt(i);
                     break;
                 }
             }
         });
+        return this;
+    }
+
+    public EntityTypeBuilder<TEntity> IsUnmappedMemberDisallowed()
+    {
+        Configure(p => p.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow);
         return this;
     }
 
@@ -69,21 +76,9 @@ public sealed class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : 
 
             foreach (var prop in p.Properties)
             {
-                if (propertyConfiguration.TryGetValue(prop.Name, out var propertyConfig))
-                {
+                var propName = prop.GetMemberName();
+                if (propertyConfiguration.TryGetValue(propName, out var propertyConfig))
                     propertyConfig(prop);
-                }
-                else if (p.Options.PropertyNamingPolicy is { } || p.Options.PropertyNameCaseInsensitive)
-                {
-                    foreach (var (name, action) in propertyConfiguration)
-                    {
-                        if (CompareNames(prop, name))
-                        {
-                            action(prop);
-                            break;
-                        }
-                    }
-                }
             }
         };
     }

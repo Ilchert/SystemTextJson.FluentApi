@@ -136,7 +136,7 @@ public class PropertyBuilderTests
     {
         _options.ConfigureDefaultTypeResolver(builder =>
             builder.Entity<ObjectCreationHandlingClass>()
-            .Property(p => p.Prop).HasObjectCreationHandling(JsonObjectCreationHandling.Populate));
+            .Property(p => p.Prop).IsPopulated());
 
         var testObject = new ObjectCreationHandlingClass();
         JsonAsserts.AssertObject(testObject, """{"Prop":{ }}""", _options);
@@ -158,6 +158,17 @@ public class PropertyBuilderTests
         Assert.Collection(doc.RootElement.EnumerateObject(),
             p => Assert.Equal("Field", p.Name),
             p => Assert.Equal("Property", p.Name));
+    }
+
+
+    [Fact]
+    public void IsRequired()
+    {
+        _options.ConfigureDefaultTypeResolver(builder =>
+            builder.Entity<TestClass>()
+            .Property(p => p.Property).IsRequired());
+
+        Assert.ThrowsAny<JsonException>(() => JsonSerializer.Deserialize<TestClass>("{}", _options));
     }
 
     private class TestConverter : JsonConverter<string>

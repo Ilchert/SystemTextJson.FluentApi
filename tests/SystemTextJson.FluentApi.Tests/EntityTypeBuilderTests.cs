@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization.Metadata;
+﻿using System.Text.Json.Serialization.Metadata;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Xunit;
+using System.Text.Json.Serialization;
 
 namespace SystemTextJson.FluentApi.Tests;
 
@@ -29,8 +25,8 @@ public class EntityTypeBuilderTests
         _options.TypeInfoResolver = _options.TypeInfoResolver!
             .ConfigureTypes(builder =>
             builder.Entity<TestClass>()
-            .Ignore(p => p.Property)
-            .Ignore(p => p.Field));
+            .IgnoreProperty(p => p.Property)
+            .IgnoreProperty(p => p.Field));
 
         var testObject = new TestClass { Property = "Prop", Field = "field" };
 
@@ -38,9 +34,32 @@ public class EntityTypeBuilderTests
         JsonAsserts.AssertObject(new TestClass { }, """{"Property":"Prop","Field":"field"}""", _options);
     }
 
+    [Fact]
+    public void IsUnmappedMemberDisallowed()
+    {
+        _options.TypeInfoResolver = _options.TypeInfoResolver!
+            .ConfigureTypes(builder =>
+            builder.Entity<TestClass>()
+            .IsUnmappedMemberDisallowed());
+
+        Assert.ThrowsAny<JsonException>(() => JsonSerializer.Deserialize<TestClass>("""{"UnmappedProperty": null}""", _options));
+    }
+
+    [Fact]
+    public void RespectNullableReferenceType()
+    {
+        _options.TypeInfoResolver = _options.TypeInfoResolver!
+            .ConfigureTypes(builder =>
+            builder.RespectNullableReferenceType());
+
+
+        Assert.ThrowsAny<JsonException>(() => JsonSerializer.Deserialize<TestClass>("""{"Pro": null}""", _options));
+    }
+
     public class TestClass
     {
-        public string? Property { get; set; }
+        [JsonPropertyName("Pro")]
+        public string Property { get; set; }
 
         public string? Field;
     }
