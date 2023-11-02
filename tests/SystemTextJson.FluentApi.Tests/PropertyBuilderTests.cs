@@ -8,7 +8,8 @@ namespace SystemTextJson.FluentApi.Tests;
 
 public class PropertyBuilderTests
 {
-    JsonSerializerOptions _options;
+    private readonly JsonSerializerOptions _options;
+
     public PropertyBuilderTests()
     {
         _options = new JsonSerializerOptions()

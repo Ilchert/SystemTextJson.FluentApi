@@ -51,6 +51,82 @@ public sealed class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : 
         return this;
     }
 
+    public EntityTypeBuilder<TEntity> HasTypeDiscriminator(string typeDiscriminator)
+    {
+        Configure(p =>
+        {
+            p.PolymorphismOptions ??= new JsonPolymorphismOptions();
+            p.PolymorphismOptions.TypeDiscriminatorPropertyName = typeDiscriminator;
+        });
+        return this;
+    }
+
+    public EntityTypeBuilder<TEntity> HasDerivedType<T>()
+    {
+        Configure(p =>
+        {
+            p.PolymorphismOptions ??= new JsonPolymorphismOptions();
+            p.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(T)));
+        });
+        return this;
+    }
+
+    public EntityTypeBuilder<TEntity> HasDerivedType<T>(string typeDiscriminator)
+    {
+        Configure(p =>
+        {
+            p.PolymorphismOptions ??= new JsonPolymorphismOptions();
+            p.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(T), typeDiscriminator));
+        });
+        return this;
+    }
+
+    public EntityTypeBuilder<TEntity> HasDerivedType<T>(int typeDiscriminator)
+    {
+        Configure(p =>
+        {
+            p.PolymorphismOptions ??= new JsonPolymorphismOptions();
+            p.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(T), typeDiscriminator));
+        });
+        return this;
+    }
+
+    public EntityTypeBuilder<TEntity> HasDerivedTypesFromAssembly(Assembly assembly, Func<Type, string>? discriminatorFormatter = null)
+    {
+        Type[] types;
+        try
+        {
+            types = assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException ex)
+        {
+            types = ex.Types;
+        }
+
+        types = types.Where(p => p != null && p.IsAssignableTo(typeof(TEntity))).ToArray();
+        if (types.Length == 0) 
+            return this;
+
+        if (discriminatorFormatter is not null)
+        {
+            Configure(p =>
+            {
+                p.PolymorphismOptions ??= new JsonPolymorphismOptions();
+                foreach (var type in types)
+                    p.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(type, discriminatorFormatter(type)));
+            });
+        }
+        else
+        {
+            Configure(p =>
+            {
+                p.PolymorphismOptions ??= new JsonPolymorphismOptions();
+                foreach (var type in types)
+                    p.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(type));
+            });
+        }
+        return this;
+    }
 
     private static string GetPropertyName<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
     {
