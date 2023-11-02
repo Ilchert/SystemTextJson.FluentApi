@@ -21,7 +21,6 @@ public class PropertyBuilderTests
     [Fact]
     public void HasName()
     {
-        // inheritance, validation
 
         _options.ConfigureDefaultTypeResolver(builder =>
             builder.Entity<TestClass>()
@@ -37,7 +36,6 @@ public class PropertyBuilderTests
     public void HasConverter()
     {
         var converter = new TestConverter();
-        // inheritance, validation
 
         _options.ConfigureDefaultTypeResolver(builder =>
             builder.Entity<TestClass>()
@@ -145,8 +143,6 @@ public class PropertyBuilderTests
     [Fact]
     public void HasOrder()
     {
-        // inheritance, validation
-
         _options.ConfigureDefaultTypeResolver(builder =>
             builder.Entity<TestClass>()
             .Property(p => p.Property).HasOrder(2)
