@@ -120,7 +120,7 @@ Serialization of `testObject` will produce:
 But in this case only serialization is available because JSON does not contain type discriminator and `JsonException` will be thrown on deserialization.
 
 # Nullable reference type support
-STJ has build in support of `required` properties, but it just check, that value exist on deserialization and does not prevent setting `null` to none nullable properties. Fluent Api can configure `JsonSerializerOptions` to respect NRT annotations on fields and properties. Internally it uses [JsonPropertyInfo.Set](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.serialization.metadata.jsonpropertyinfo.set) property and reduces deserialization performance.
+STJ has build in support of [`required`](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/required) properties, but it just check, that value exists in JSON on deserialization and does not prevent setting `null` to none nullable properties. Fluent Api can configure `JsonSerializerOptions` to respect NRT annotations on fields and properties. Internally it uses [JsonPropertyInfo.Set](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.serialization.metadata.jsonpropertyinfo.set) property and reduces deserialization performance.
 
 ```C#
 builder.RespectNullableReferenceType();
