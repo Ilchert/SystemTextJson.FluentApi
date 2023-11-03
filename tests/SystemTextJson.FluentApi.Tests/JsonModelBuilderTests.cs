@@ -20,9 +20,10 @@ public class JsonModelBuilderTests
     [Fact]
     public void RespectNullableReferenceType()
     {
-        _options.TypeInfoResolver = _options.TypeInfoResolver!
-            .ConfigureTypes(builder =>
+        _options.ConfigureDefaultTypeResolver(builder =>
             builder.RespectNullableReferenceType());
+
+        JsonAsserts.AssertObject(new TestClass(), "{}", _options);
 
         Assert.ThrowsAny<JsonException>(() => JsonSerializer.Deserialize<TestClass>("""{"Pro": null}""", _options));
         Assert.ThrowsAny<JsonException>(() => JsonSerializer.Deserialize<TestClass>("""{"Field": null}""", _options));

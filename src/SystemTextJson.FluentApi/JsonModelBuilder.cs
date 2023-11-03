@@ -35,7 +35,7 @@ public sealed class JsonModelBuilder
 
             foreach (var prop in p.Properties)
             {
-                if (prop.Set is null)
+                if (prop.Set is null || !prop.PropertyType.IsClass)
                     continue;
 
                 var memberInfo = prop.GetMemberInfo(p.Type);
@@ -53,7 +53,7 @@ public sealed class JsonModelBuilder
                     prop.Set = (o, value) =>
                     {
                         if (value is null)
-                            throw new JsonException($"Can not null to {propertyName}.");
+                            throw new JsonException($"Can not set null to none nullable property {propertyName}.");
 
                         set(o, value);
                     };

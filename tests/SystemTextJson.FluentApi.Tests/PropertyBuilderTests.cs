@@ -186,8 +186,7 @@ public class PropertyBuilderTests
     [Fact]
     public void SerializeAsObject()
     {
-        _options.TypeInfoResolver = _options.TypeInfoResolver!
-            .ConfigureTypes(builder =>
+        _options.ConfigureDefaultTypeResolver(builder =>
             builder.Entity<AsObjectTestClass>()
             .Property(p => p.Data).SerializeAsObject());
 

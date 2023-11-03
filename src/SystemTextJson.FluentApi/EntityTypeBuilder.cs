@@ -44,7 +44,7 @@ public sealed class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : 
         return this;
     }
 
-    public EntityTypeBuilder<TEntity> HasDerivedType<T>()
+    public EntityTypeBuilder<TEntity> HasDerivedType<T>() where T : TEntity
     {
         Configure(p =>
         {
@@ -54,7 +54,7 @@ public sealed class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : 
         return this;
     }
 
-    public EntityTypeBuilder<TEntity> HasDerivedType<T>(string typeDiscriminator)
+    public EntityTypeBuilder<TEntity> HasDerivedType<T>(string typeDiscriminator) where T : TEntity
     {
         Configure(p =>
         {
@@ -64,7 +64,7 @@ public sealed class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : 
         return this;
     }
 
-    public EntityTypeBuilder<TEntity> HasDerivedType<T>(int typeDiscriminator)
+    public EntityTypeBuilder<TEntity> HasDerivedType<T>(int typeDiscriminator) where T : TEntity
     {
         Configure(p =>
         {

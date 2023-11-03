@@ -12,14 +12,4 @@ public static class JsonTypeInfoResolverExtensions
         var action = modelBuilder.Build();
         return resolver.WithAddedModifier(action);
     }
-
-    public static JsonSerializerOptions ConfigureDefaultTypeResolver(this JsonSerializerOptions options, Action<JsonModelBuilder> configureAction)
-    {
-        var modelBuilder = new JsonModelBuilder();
-        configureAction(modelBuilder);
-        var action = modelBuilder.Build();
-        options.TypeInfoResolver ??= new DefaultJsonTypeInfoResolver();
-        options.TypeInfoResolver = options.TypeInfoResolver.WithAddedModifier(action);
-        return options;
-    }
 }
