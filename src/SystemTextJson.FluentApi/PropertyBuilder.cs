@@ -66,6 +66,33 @@ public class PropertyBuilder<TEntity, TProperty>(string propertyName, EntityType
         return this;
     }
 
+    public PropertyBuilder<TEntity, TProperty> IsIgnored()
+    {
+        var pn = propertyName;
+
+        entityTypeBuilder.Configure(p =>
+        {
+            for (var i = 0; i < p.Properties.Count; i++)
+            {
+                if (p.Properties[i].GetMemberName() == pn)
+                {
+                    p.Properties.RemoveAt(i);
+                    break;
+                }
+            }
+        });
+        return this;
+    }
+
+    public PropertyBuilder<TEntity, TProperty> SerializeAsObject()
+    {
+        Configure(p =>
+        {
+            p.CustomConverter = ObjectSerializer<TProperty>.Instance;
+        });
+        return this;
+    }
+
     public PropertyBuilder<TEntity, TProperty> Property<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
     {
         return entityTypeBuilder.Property(propertyExpression);

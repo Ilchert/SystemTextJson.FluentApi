@@ -28,23 +28,6 @@ public sealed class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : 
         return newBuilder;
     }
 
-    public EntityTypeBuilder<TEntity> IgnoreProperty<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
-    {
-        var propertyName = GetPropertyName(propertyExpression);
-        Configure(p =>
-        {
-            for (var i = 0; i < p.Properties.Count; i++)
-            {
-                if (p.Properties[i].GetMemberName() == propertyName)
-                {
-                    p.Properties.RemoveAt(i);
-                    break;
-                }
-            }
-        });
-        return this;
-    }
-
     public EntityTypeBuilder<TEntity> IsUnmappedMemberDisallowed()
     {
         Configure(p => p.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow);
@@ -100,11 +83,11 @@ public sealed class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : 
         }
         catch (ReflectionTypeLoadException ex)
         {
-            types = ex.Types;
+            types = ex.Types.Where(p => p != null).ToArray()!;
         }
 
         types = types.Where(p => p != null && p.IsAssignableTo(typeof(TEntity))).ToArray();
-        if (types.Length == 0) 
+        if (types.Length == 0)
             return this;
 
         if (discriminatorFormatter is not null)

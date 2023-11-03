@@ -19,23 +19,6 @@ public class EntityTypeBuilderTests
     }
 
     [Fact]
-    public void Ignore()
-    {
-        // inheritance, validation
-
-        _options.TypeInfoResolver = _options.TypeInfoResolver!
-            .ConfigureTypes(builder =>
-            builder.Entity<TestClass>()
-            .IgnoreProperty(p => p.Property)
-            .IgnoreProperty(p => p.Field));
-
-        var testObject = new TestClass { Property = "Prop", Field = "field" };
-
-        JsonAsserts.AssertJson(testObject, """{}""", _options);
-        JsonAsserts.AssertObject(new TestClass { }, """{"Property":"Prop","Field":"field"}""", _options);
-    }
-
-    [Fact]
     public void IsUnmappedMemberDisallowed()
     {
         _options.TypeInfoResolver = _options.TypeInfoResolver!
@@ -70,17 +53,17 @@ public class EntityTypeBuilderTests
 
     public class Root
     {
-        public string RootProperty { get; set; }
+        public string? RootProperty { get; set; }
     }
 
     public class Derived1 : Root
     {
-        public string Derived1Property { get; set; }
+        public string? Derived1Property { get; set; }
     }
 
     public class Derived2 : Root
     {
-        public string Derived2Property { get; set; }
+        public string? Derived2Property { get; set; }
     }
 
     public class TestClass

@@ -168,6 +168,35 @@ public class PropertyBuilderTests
         Assert.ThrowsAny<JsonException>(() => JsonSerializer.Deserialize<TestClass>("{}", _options));
     }
 
+    [Fact]
+    public void Ignore()
+    {
+        _options.TypeInfoResolver = _options.TypeInfoResolver!
+            .ConfigureTypes(builder =>
+            builder.Entity<TestClass>()
+            .Property(p => p.Property).IsIgnored()
+            .Property(p => p.Field).IsIgnored());
+
+        var testObject = new TestClass { Property = "Prop", Field = "field" };
+
+        JsonAsserts.AssertJson(testObject, """{}""", _options);
+        JsonAsserts.AssertObject(new TestClass { }, """{"Property":"Prop","Field":"field"}""", _options);
+    }
+
+    [Fact]
+    public void SerializeAsObject()
+    {
+        _options.TypeInfoResolver = _options.TypeInfoResolver!
+            .ConfigureTypes(builder =>
+            builder.Entity<AsObjectTestClass>()
+            .Property(p => p.Data).SerializeAsObject());
+
+        var testObject = new AsObjectTestClass { Data = new Derived() { Property = "Prop" } };
+        JsonSerializer.Serialize(testObject, _options);
+        JsonAsserts.AssertJson(testObject, """{"Data":{"Property":"Prop"}}""", _options);
+        Assert.Throws<JsonException>(() => JsonAsserts.AssertObject(new AsObjectTestClass(), """{"Data":{"Property":"Prop"}}""", _options));
+    }
+
     private class TestConverter : JsonConverter<string>
     {
         public int CallCount { get; private set; }
@@ -201,7 +230,7 @@ public class PropertyBuilderTests
 
     public class ExtensionDataJsonObject
     {
-        public JsonObject Data { get; set; }
+        public JsonObject? Data { get; set; }
     }
 
     public class TestClass
@@ -219,5 +248,17 @@ public class PropertyBuilderTests
     public class ObjectCreationHandlingClass
     {
         public TestClass Prop { get; set; } = new TestClass() { Property = "1" };
+    }
+
+    public class AsObjectTestClass
+    {
+        public Root? Data { get; set; }
+    }
+
+    public class Root { }
+
+    public class Derived : Root
+    {
+        public string? Property { get; set; }
     }
 }
