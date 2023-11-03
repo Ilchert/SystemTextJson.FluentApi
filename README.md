@@ -85,7 +85,7 @@ Serialization of `testObject` collection will produce:
 ]
 ```
 
-With `$type` discriminator serializer are able to deserialize this collection. Another approach to serialization is use actual type from object instance, instead of property type. To achieve this behavioral serializer can threat specific type as `object`. Fluent Api has two way for this - configure behavior for specific property with `PropertyBuilder.SerializeAsObject` or setup `JsonSerialiserOptions` with `JsonSerializerOptionsExtensions.SerializeAsObject`.
+With `$type` discriminator serializer are able to deserialize this collection. Another approach to serialization is use actual type from object instance, instead of property type. To achieve this behavior serializer can threat specific type as `object`. Fluent Api has two way for this - configure behavior for specific property with `PropertyBuilder.SerializeAsObject` or for specific type with `JsonSerializerOptionsExtensions.SerializeAsObject`.
 
 ```C#
 builder.Entity<AsObjectTestClass>().Property(p => p.Data).SerializeAsObject();
