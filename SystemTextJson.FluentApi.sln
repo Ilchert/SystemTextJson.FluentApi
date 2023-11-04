@@ -11,6 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SystemTextJson.FluentApi.Qu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{D66C1040-8D07-436A-AD30-E1888B556441}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
 		LICENSE = LICENSE
 		README.md = README.md
