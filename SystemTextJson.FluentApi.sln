@@ -7,7 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SystemTextJson.FluentApi", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SystemTextJson.FluentApi.Tests", "tests\SystemTextJson.FluentApi.Tests\SystemTextJson.FluentApi.Tests.csproj", "{1AD3BC43-4E56-418E-BA9F-11DDD0028C74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemTextJson.FluentApi.QuickStart", "samples\SystemTextJson.FluentApi.QuickStart\SystemTextJson.FluentApi.QuickStart.csproj", "{220BD50B-2A8F-4000-B984-3AB75FB24D93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SystemTextJson.FluentApi.QuickStart", "samples\SystemTextJson.FluentApi.QuickStart\SystemTextJson.FluentApi.QuickStart.csproj", "{220BD50B-2A8F-4000-B984-3AB75FB24D93}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{D66C1040-8D07-436A-AD30-E1888B556441}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

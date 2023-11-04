@@ -30,8 +30,8 @@ public class PropertyBuilder<TEntity, TProperty>(string propertyName, EntityType
 
     public PropertyBuilder<TEntity, TProperty> IsExtensionData()
     {
-        if (typeof(TProperty).IsAssignableTo(typeof(IDictionary<string, JsonElement>)) ||
-            typeof(TProperty).IsAssignableTo(typeof(IDictionary<string, object>)) ||
+        if (typeof(IDictionary<string, JsonElement>).IsAssignableFrom(typeof(TProperty)) ||
+            typeof(IDictionary<string, object>).IsAssignableFrom(typeof(TProperty)) ||
             typeof(TProperty) == typeof(JsonObject))
         {
             Configure(p => p.IsExtensionData = true);
@@ -86,17 +86,12 @@ public class PropertyBuilder<TEntity, TProperty>(string propertyName, EntityType
 
     public PropertyBuilder<TEntity, TProperty> SerializeAsObject()
     {
-        Configure(p =>
-        {
-            p.CustomConverter = ObjectSerializer<TProperty>.Instance;
-        });
+        Configure(p => p.CustomConverter = ObjectSerializer<TProperty>.Instance);
         return this;
     }
 
-    public PropertyBuilder<TEntity, TProperty> Property<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
-    {
-        return entityTypeBuilder.Property(propertyExpression);
-    }
+    public PropertyBuilder<TEntity, TProperty> Property<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression) =>
+        entityTypeBuilder.Property(propertyExpression);
 
     Action<JsonPropertyInfo> IPropertyBuilder.Build()
     {

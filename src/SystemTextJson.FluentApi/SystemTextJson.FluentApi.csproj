@@ -1,9 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Version>0.1.0</Version>
+		<TargetFrameworks>net6.0;net7.0;netstandard2.0;net462</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>12</LangVersion>
+		<IsPackable>true</IsPackable>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>Fluent configuration library for System.Text.Json that allows developers to configure serialization uses strongly typed fluent interface and lambda expression.</Title>
+		<Authors>ilchert</Authors>
+		<Description>SystemTextJson.FluentApi is a fluent configuration library for System.Text.Json.</Description>
+		<PackageProjectUrl>https://github.com/Ilchert/SystemTextJson.FluentApi</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/Ilchert/SystemTextJson.FluentApi</RepositoryUrl>
+		<PackageTags>System.Text.Json; STJ; Serialization; JSON; Fluent Api</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath=""/>
+		<None Include="..\..\LICENSE" Pack="true" PackagePath=""/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Text.Json" Version="8.0.0-rc.2.23479.6" />
+	</ItemGroup>
 
 </Project>

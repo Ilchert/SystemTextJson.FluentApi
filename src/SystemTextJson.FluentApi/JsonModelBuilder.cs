@@ -1,5 +1,4 @@
-﻿using System.Collections.Frozen;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
@@ -25,6 +24,8 @@ public sealed class JsonModelBuilder
         _typeConfigurations.Add(configureAction);
         return this;
     }
+
+#if NET6_0_OR_GREATER
 
     public JsonModelBuilder RespectNullableReferenceType()
     {
@@ -63,16 +64,18 @@ public sealed class JsonModelBuilder
         return this;
     }
 
+#endif
     public Action<JsonTypeInfo> Build()
     {
-        var config = _configurations.ToFrozenDictionary(p => p.Key, p => p.Value.Build());
+        var config = _configurations.ToDictionary(p => p.Key, p => p.Value.Build());
         var typeConfig = _typeConfigurations.ToArray();
         return p =>
         {
             foreach (var cfg in typeConfig)
                 cfg(p);
 
-            config.GetValueOrDefault(p.Type)?.Invoke(p);
+            if (config.TryGetValue(p.Type, out var action))
+                action(p);
         };
     }
 }

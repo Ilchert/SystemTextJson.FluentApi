@@ -1,7 +1,5 @@
-﻿using System.Collections.Frozen;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
@@ -86,7 +84,7 @@ public sealed class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : 
             types = ex.Types.Where(p => p != null).ToArray()!;
         }
 
-        types = types.Where(p => p != null && p.IsAssignableTo(typeof(TEntity))).ToArray();
+        types = types.Where(p => p != null && typeof(TEntity).IsAssignableFrom(p)).ToArray();
         if (types.Length == 0)
             return this;
 
@@ -124,7 +122,7 @@ public sealed class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : 
 
     Action<JsonTypeInfo> IEntityTypeBuilder.Build()
     {
-        var propertyConfiguration = _propertyConfiguration.ToFrozenDictionary(p => p.Key, p => p.Value.Build());
+        var propertyConfiguration = _propertyConfiguration.ToDictionary(p => p.Key, p => p.Value.Build());
         var typeConfigurations = _typeConfigurations.ToArray();
         return p =>
         {

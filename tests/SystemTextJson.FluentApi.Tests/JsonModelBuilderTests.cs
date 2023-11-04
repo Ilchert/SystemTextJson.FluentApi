@@ -33,8 +33,8 @@ public class JsonModelBuilderTests
     public class TestClass
     {
         [JsonPropertyName("Pro")]
-        public string Property { get; set; }
+        public string Property { get; set; } = null!;
 
-        public string Field;
+        public string Field = null!;
     }
 }

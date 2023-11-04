@@ -19,7 +19,7 @@ internal class ObjectSerializer<T> : JsonConverter<T>
         else
         {
             var objectConverter = options.GetConverter(value.GetType());
-            var mi = objectConverter.GetType().GetMethod(nameof(Write));
+            var mi = objectConverter.GetType().GetMethod(nameof(Write)) ?? throw new InvalidOperationException("JsonConverter was changed. Can't find Write method.");
             mi.Invoke(objectConverter, new object[] { writer, value, options });
         }
     }
