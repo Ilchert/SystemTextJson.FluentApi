@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -6,7 +7,7 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace SystemTextJson.FluentApi;
 
-public class PropertyBuilder<TEntity, TProperty>(string propertyName, EntityTypeBuilder<TEntity> entityTypeBuilder) : IPropertyBuilder
+public class PropertyBuilder<TEntity, TProperty>(MemberInfo memberInfo, EntityTypeBuilder<TEntity> entityTypeBuilder) : IPropertyBuilder
 {
     private readonly List<Action<JsonPropertyInfo>> _propertyConfigurations = [];
 
@@ -37,7 +38,7 @@ public class PropertyBuilder<TEntity, TProperty>(string propertyName, EntityType
             Configure(p => p.IsExtensionData = true);
         }
         else
-            throw new InvalidOperationException($"The extension data property {typeof(TEntity)}{propertyName} is invalid. It must implement 'IDictionary<string, JsonElement>' or 'IDictionary<string, object>', or be 'JsonObject'.");
+            throw new InvalidOperationException($"The extension data property {typeof(TEntity)}{memberInfo} is invalid. It must implement 'IDictionary<string, JsonElement>' or 'IDictionary<string, object>', or be 'JsonObject'.");
 
         return this;
     }
@@ -68,13 +69,13 @@ public class PropertyBuilder<TEntity, TProperty>(string propertyName, EntityType
 
     public PropertyBuilder<TEntity, TProperty> IsIgnored()
     {
-        var pn = propertyName;
+        var mi = memberInfo;
 
         entityTypeBuilder.Configure(p =>
         {
             for (var i = 0; i < p.Properties.Count; i++)
             {
-                if (p.Properties[i].GetMemberName() == pn)
+                if (p.Properties[i].GetMemberInfo() == mi)
                 {
                     p.Properties.RemoveAt(i);
                     break;

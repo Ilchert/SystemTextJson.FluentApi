@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
@@ -33,14 +33,12 @@ public sealed class JsonModelBuilder
 
         Configure(p =>
         {
-
             foreach (var prop in p.Properties)
             {
                 if (prop.Set is null || !prop.PropertyType.IsClass)
                     continue;
 
-                var memberInfo = prop.GetMemberInfo(p.Type);
-                var nullState = memberInfo switch
+                var nullState = prop.GetMemberInfo() switch
                 {
                     PropertyInfo pi => nullabilityInfoContext.Create(pi).WriteState,
                     FieldInfo fi => nullabilityInfoContext.Create(fi).WriteState,
