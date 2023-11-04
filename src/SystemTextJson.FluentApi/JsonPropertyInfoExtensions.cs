@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -10,10 +10,10 @@ namespace SystemTextJson.FluentApi;
 
 internal static class JsonPropertyInfoExtensions
 {
-    private static readonly PropertyInfo? GetMemberNamePropertyInfo = typeof(JsonPropertyInfo).GetProperty("MemberName", BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly PropertyInfo? s_getMemberNamePropertyInfo = typeof(JsonPropertyInfo).GetProperty("MemberName", BindingFlags.NonPublic | BindingFlags.Instance);
 
     public static string GetMemberName(this JsonPropertyInfo jsonProp) =>
-        (string?)GetMemberNamePropertyInfo?.GetValue(jsonProp) ?? jsonProp.Name;
+        (string?)s_getMemberNamePropertyInfo?.GetValue(jsonProp) ?? jsonProp.Name;
 
     public static MemberInfo? GetMemberInfo(this JsonPropertyInfo jsonProp, Type type)
     {

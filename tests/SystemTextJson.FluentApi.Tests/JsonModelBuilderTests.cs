@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Xunit;
@@ -7,7 +7,7 @@ namespace SystemTextJson.FluentApi.Tests;
 
 public class JsonModelBuilderTests
 {
-    JsonSerializerOptions _options;
+    private readonly JsonSerializerOptions _options;
     public JsonModelBuilderTests()
     {
         _options = new JsonSerializerOptions()
