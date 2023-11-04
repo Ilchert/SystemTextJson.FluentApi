@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.Json.Serialization.Metadata;
-using System.Threading.Tasks;
 
 namespace SystemTextJson.FluentApi;
 
@@ -18,12 +13,10 @@ internal static class JsonPropertyInfoExtensions
     public static MemberInfo? GetMemberInfo(this JsonPropertyInfo jsonProp, Type type)
     {
         var memberName = jsonProp.GetMemberName();
-        var members = type.GetMember(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-        foreach (var mi in members)
-        {
-            if (mi.MemberType is MemberTypes.Property or MemberTypes.Field)
-                return mi;
-        }
+        var members = type.GetMember(memberName, MemberTypes.Field | MemberTypes.Property, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        if(members?.Length>0) 
+            return members[0];
+
         return null;
     }
 }
