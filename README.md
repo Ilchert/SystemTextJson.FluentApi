@@ -15,6 +15,7 @@ options.ConfigureDefaultTypeResolver(p =>
 p.Entity<Person>()
 .Property(p => p.LastName).HasName("surname")
 .Property(p => p.FirstName).IsIgnored()
+.VirtualProperty("FullName", p => $"{p.FirstName} {p.LastName}")
 .Property(p => p.Age).HasHumberHandling(JsonNumberHandling.WriteAsString));
 
 var person = new Person() { FirstName = "First name", LastName = "Last name", Age = 12 };
@@ -27,7 +28,8 @@ This example produce this JSON
 ```Json
 {
   "surname": "Last name",
-  "Age": "12"
+  "Age": "12",
+  "FullName": "First name Last name"
 }
 ```
 
@@ -136,3 +138,31 @@ public class TestClass
 }
 ```
 
+# Virtual properties
+
+Fluent Api can define virtual properties, that does not match to any real property in object.
+
+```C#
+builder.Entity<Person>()
+.Property(p => p.LastName).IsIgnored()
+.Property(p => p.FirstName).IsIgnored()
+.VirtualProperty("FullName", p => $"{p.FirstName} {p.LastName}")
+
+var testObject = new Person() { FirstName = "First name", LastName = "Last name" };
+
+class Person
+{
+    public string? FirstName { get; set; }
+
+    public string? LastName { get; set; }
+}
+
+```
+
+Serialization of `testObject` collection will produce:
+
+```JSON
+{
+    "FullName": "First name Last name"
+}
+```

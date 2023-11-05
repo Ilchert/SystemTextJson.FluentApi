@@ -80,11 +80,15 @@ public static class EntityTypeBuilderExtensions
     {
         builder.Configure(p =>
         {
+            if (p.Properties.Any(p => p.Name == name))
+                return;
             var propInfo = p.CreateJsonPropertyInfo(typeof(TProperty), name);
             propInfo.Get = (o) => compute((TEntity)o);
             p.Properties.Add(propInfo);
         });
-        return new(name, builder);
+        var newBuilder = new VirtualPropertyBuilder<TEntity, TProperty>(name, builder);
+        builder.PropertyBuilders.Add(newBuilder);
+        return newBuilder;
     }
 
 

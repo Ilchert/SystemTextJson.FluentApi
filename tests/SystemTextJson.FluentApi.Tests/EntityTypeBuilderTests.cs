@@ -35,9 +35,12 @@ public class EntityTypeBuilderTests
                 builder.Entity<TestClass>()
                 .Property(p => p.Property).IsIgnored()
                 .Property(p => p.Field).IsIgnored()
-                .VirtualProperty("virtualProperty", p => "computed"));
+                .VirtualProperty("virtualProperty", p => "computed")
+                .Entity<TestClass>()
+                .VirtualProperty("virtualProperty", p => "computed")
+                .HasName("renamedVirtualProperty"));
 
-        JsonAsserts.AssertJson(new TestClass { }, """{"virtualProperty":"computed"}""", _options);
+        JsonAsserts.AssertJson(new TestClass { }, """{"renamedVirtualProperty":"computed"}""", _options);
     }
 
     [Fact]

@@ -1,7 +1,3 @@
-using System.IO;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
 namespace SystemTextJson.FluentApi;
@@ -36,6 +32,11 @@ public class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : IEntity
             .Select(p => (p.Key, Value: (Action<JsonPropertyInfo>)Delegate.Combine(p.ToArray())!))
             .ToDictionary(p => p.Key, p => p.Value);
 
+        var namedProperties = PropertyBuilders.Where(p => p is not IMemberPropertyBuilder).
+            GroupBy(p => p.Name, p => p.Build())
+            .Select(p => (p.Key, Value: (Action<JsonPropertyInfo>)Delegate.Combine(p.ToArray())!))
+            .ToDictionary(p => p.Key, p => p.Value);
+
         var typeConfigurations = JsonTypeInfoActions.ToArray();
         return p =>
         {
@@ -45,8 +46,14 @@ public class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : IEntity
             foreach (var prop in p.Properties)
             {
                 var mi = prop.GetMemberInfo();
-                if (mi != null && memberProperties.TryGetValue(mi, out var propertyConfig))
-                    propertyConfig(prop);
+                Action<JsonPropertyInfo>? propertyConfig = null;
+
+                if (mi is null)
+                    namedProperties.TryGetValue(prop.Name, out propertyConfig);
+                else
+                    memberProperties.TryGetValue(mi, out propertyConfig);
+
+                propertyConfig?.Invoke(prop);
             }
         };
     }

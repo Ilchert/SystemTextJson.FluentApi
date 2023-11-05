@@ -1,4 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
+// See https://aka.ms/new-console-template for more information
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using SystemTextJson.FluentApi;
@@ -8,6 +8,7 @@ options.ConfigureDefaultTypeResolver(p =>
 p.Entity<Person>()
 .Property(p => p.LastName).HasName("surname")
 .Property(p => p.FirstName).IsIgnored()
+.VirtualProperty("FullName", p => $"{p?.FirstName} {p?.LastName}")
 .Property(p => p.Age).HasHumberHandling(JsonNumberHandling.WriteAsString));
 
 var person = new Person() { FirstName = "First name", LastName = "Last name", Age = 12 };
