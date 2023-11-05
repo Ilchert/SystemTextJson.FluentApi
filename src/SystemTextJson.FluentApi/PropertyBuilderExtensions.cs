@@ -27,9 +27,9 @@ public static class PropertyBuilderExtensions
     public static EntityTypeBuilder<TEntity> Entity<TEntity>(this IPropertyBuilder propertyBuilder) =>
         propertyBuilder.EntityTypeBuilder.ModelBuilder.Entity<TEntity>();
 
-    public static MemberPropertyBuilder<TEntity, TProperty> Property<TEntity, TProperty>(this IPropertyBuilder<TEntity, TProperty> builder, Expression<Func<TEntity, TProperty>> propertyExpression) =>
+    public static MemberPropertyBuilder<TEntity, TOtherProperty> Property<TEntity, TProperty, TOtherProperty>(this IPropertyBuilder<TEntity, TProperty> builder, Expression<Func<TEntity, TOtherProperty>> propertyExpression) =>
        builder.EntityTypeBuilder.Property(propertyExpression);
 
-    public static VirtualPropertyBuilder<TEntity, TProperty> VirtualProperty<TEntity, TProperty>(this IPropertyBuilder<TEntity, TProperty> builder, string name, Func<TEntity?, TProperty> compute) =>
+    public static VirtualPropertyBuilder<TEntity, TOtherProperty> VirtualProperty<TEntity, TProperty, TOtherProperty>(this IPropertyBuilder<TEntity, TProperty> builder, string name, Func<TEntity?, TOtherProperty> compute) =>
       builder.EntityTypeBuilder.VirtualProperty(name, compute);
 }
