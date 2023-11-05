@@ -1,5 +1,5 @@
 [![NuGet](https://buildstats.info/nuget/SystemTextJson.FluentApi)](https://www.nuget.org/packages/SystemTextJson.FluentApi/ "Download SystemTextJson.FluentApi from NuGet.org")
-
+WARNING: this package is under active development so the api may change at any time.
 # SystemTextJson.FluentApi
 SystemTextJson.FluentApi is a fluent configuration library for System.Text.Json that allows developers to configure serialization uses strongly typed fluent interface and lambda expression.
 
