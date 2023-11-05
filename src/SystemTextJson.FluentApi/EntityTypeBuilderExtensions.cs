@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -76,7 +76,7 @@ public static class EntityTypeBuilderExtensions
         return builder;
     }
 
-    public static MemberPropertyBuilder<TEntity, TProperty> VirtualProperty<TEntity, TProperty>(this IEntityTypeBuilder<TEntity> builder, string name, Func<TEntity?, TProperty> compute)
+    public static VirtualPropertyBuilder<TEntity, TProperty> VirtualProperty<TEntity, TProperty>(this IEntityTypeBuilder<TEntity> builder, string name, Func<TEntity?, TProperty> compute)
     {
         builder.Configure(p =>
         {
@@ -84,7 +84,7 @@ public static class EntityTypeBuilderExtensions
             propInfo.Get = (o) => compute((TEntity)o);
             p.Properties.Add(propInfo);
         });
-        return null;
+        return new(name, builder);
     }
 
 

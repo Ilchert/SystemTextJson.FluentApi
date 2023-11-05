@@ -21,15 +21,24 @@ public class EntityTypeBuilderTests
     [Fact]
     public void IsUnmappedMemberDisallowed()
     {
-        _options.TypeInfoResolver = _options.TypeInfoResolver!
-            .ConfigureTypes(builder =>
+        _options.ConfigureDefaultTypeResolver(builder =>
             builder.Entity<TestClass>()
             .IsUnmappedMemberDisallowed());
 
         Assert.ThrowsAny<JsonException>(() => JsonSerializer.Deserialize<TestClass>("""{"UnmappedProperty": null}""", _options));
     }
 
+    [Fact]
+    public void VirtualProperty()
+    {
+        _options.ConfigureDefaultTypeResolver(builder =>
+                builder.Entity<TestClass>()
+                .Property(p => p.Property).IsIgnored()
+                .Property(p => p.Field).IsIgnored()
+                .VirtualProperty("virtualProperty", p => "computed"));
 
+        JsonAsserts.AssertJson(new TestClass { }, """{"virtualProperty":"computed"}""", _options);
+    }
 
     [Fact]
     public void HasDerivedType()
