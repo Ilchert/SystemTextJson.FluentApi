@@ -17,6 +17,20 @@ public class JsonModelBuilderTests
         };
     }
 
+
+    [Fact]
+    public void MultiConfiguration()
+    {
+        _options.ConfigureDefaultTypeResolver(builder =>
+            builder.Entity<TestClass>()
+            .Property(p => p.Property).HasName("Prop1")
+            .Property(p => p.Property).HasName("Prop2")
+            .Entity<TestClass>()
+            .Property(p => p.Field).HasName("Field1").HasName("Field2"));
+
+        JsonAsserts.AssertJsonAndObject(new TestClass() { Property = "Prop", Field = "Field" }, """{"Prop2":"Prop","Field2":"Field"}""", _options);
+    }
+
     [Fact]
     public void RespectNullableReferenceType()
     {

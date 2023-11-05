@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -5,136 +6,46 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace SystemTextJson.FluentApi;
 
-public sealed class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : IEntityTypeBuilder
+public class EntityTypeBuilder<TEntity>(JsonModelBuilder modelBuilder) : IEntityTypeBuilder<TEntity>
 {
-    private readonly List<Action<JsonTypeInfo<TEntity>>> _typeConfigurations = [];
-    private readonly Dictionary<MemberInfo, IPropertyBuilder> _propertyConfiguration = [];
-    internal readonly JsonModelBuilder ModelBuilder = modelBuilder;
+    public Type EntityType => typeof(TEntity);
+    public IList<Action<JsonTypeInfo>> JsonTypeInfoActions { get; } = [];
+    public IList<IPropertyBuilder> PropertyBuilders { get; } = [];
 
-    public EntityTypeBuilder<TEntity> Configure(Action<JsonTypeInfo<TEntity>> configureAction)
+    public JsonModelBuilder ModelBuilder { get; } = modelBuilder;
+
+    public EntityTypeBuilder<TEntity> ConfigureTyped(Action<JsonTypeInfo<TEntity>> configureAction)
     {
-        _typeConfigurations.Add(configureAction);
+        JsonTypeInfoActions.Add(p => configureAction((JsonTypeInfo<TEntity>)p));
         return this;
     }
 
-    public PropertyBuilder<TEntity, TProperty> Property<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
-    {
-        var mi = GetMemberInfo(propertyExpression);
+    public EntityTypeBuilder<TEntity> HasDerivedType<T>() where T : TEntity =>
+        this.HasDerivedType(typeof(T));
 
-        var newBuilder = new PropertyBuilder<TEntity, TProperty>(mi, this);
-        _propertyConfiguration[mi] = newBuilder;
-        return newBuilder;
-    }
+    public EntityTypeBuilder<TEntity> HasDerivedType<T>(string typeDiscriminator) where T : TEntity =>
+        this.HasDerivedType(typeof(T), typeDiscriminator);
 
-    public EntityTypeBuilder<TEntity> IsUnmappedMemberDisallowed()
-    {
-        Configure(p => p.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow);
-        return this;
-    }
-
-    public EntityTypeBuilder<TEntity> HasTypeDiscriminator(string typeDiscriminator)
-    {
-        Configure(p =>
-        {
-            p.PolymorphismOptions ??= new JsonPolymorphismOptions();
-            p.PolymorphismOptions.TypeDiscriminatorPropertyName = typeDiscriminator;
-        });
-        return this;
-    }
-
-    public EntityTypeBuilder<TEntity> HasDerivedType<T>() where T : TEntity
-    {
-        Configure(p =>
-        {
-            p.PolymorphismOptions ??= new JsonPolymorphismOptions();
-            p.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(T)));
-        });
-        return this;
-    }
-
-    public EntityTypeBuilder<TEntity> HasDerivedType<T>(string typeDiscriminator) where T : TEntity
-    {
-        Configure(p =>
-        {
-            p.PolymorphismOptions ??= new JsonPolymorphismOptions();
-            p.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(T), typeDiscriminator));
-        });
-        return this;
-    }
-
-    public EntityTypeBuilder<TEntity> HasDerivedType<T>(int typeDiscriminator) where T : TEntity
-    {
-        Configure(p =>
-        {
-            p.PolymorphismOptions ??= new JsonPolymorphismOptions();
-            p.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(T), typeDiscriminator));
-        });
-        return this;
-    }
-
-    public EntityTypeBuilder<TEntity> HasDerivedTypesFromAssembly(Assembly assembly, Func<Type, string>? discriminatorFormatter = null)
-    {
-        Type[] types;
-        try
-        {
-            types = assembly.GetTypes();
-        }
-        catch (ReflectionTypeLoadException ex)
-        {
-            types = ex.Types.Where(p => p != null).ToArray()!;
-        }
-
-        types = types.Where(p => p != null && typeof(TEntity).IsAssignableFrom(p)).ToArray();
-        if (types.Length == 0)
-            return this;
-
-        if (discriminatorFormatter is not null)
-        {
-            Configure(p =>
-            {
-                p.PolymorphismOptions ??= new JsonPolymorphismOptions();
-                foreach (var type in types)
-                    p.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(type, discriminatorFormatter(type)));
-            });
-        }
-        else
-        {
-            Configure(p =>
-            {
-                p.PolymorphismOptions ??= new JsonPolymorphismOptions();
-                foreach (var type in types)
-                    p.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(type));
-            });
-        }
-        return this;
-    }
-
-    private static MemberInfo GetMemberInfo<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
-    {
-        if (propertyExpression.Body is not MemberExpression member)
-            throw new ArgumentException($"Expression '{propertyExpression}' refers to a method, not a property.");
-
-        if (member.Member is not (PropertyInfo or FieldInfo))
-            throw new ArgumentException($"Expression '{propertyExpression}' refers to a field, not a property.");
-
-        return member.Member;
-    }
+    public EntityTypeBuilder<TEntity> HasDerivedType<T>(int typeDiscriminator) where T : TEntity =>
+        this.HasDerivedType(typeof(T), typeDiscriminator);
 
     Action<JsonTypeInfo> IEntityTypeBuilder.Build()
     {
-        var propertyConfiguration = _propertyConfiguration.ToDictionary(p => p.Key, p => p.Value.Build());
-        var typeConfigurations = _typeConfigurations.ToArray();
+        var memberProperties = PropertyBuilders.OfType<IMemberPropertyBuilder>()
+            .GroupBy(p => p.MemberInfo, p => p.Build())
+            .Select(p => (p.Key, Value: (Action<JsonPropertyInfo>)Delegate.Combine(p.ToArray())!))
+            .ToDictionary(p => p.Key, p => p.Value);
+
+        var typeConfigurations = JsonTypeInfoActions.ToArray();
         return p =>
         {
-            var typedInfo = (JsonTypeInfo<TEntity>)p;
-
             foreach (var tc in typeConfigurations)
-                tc(typedInfo);
+                tc(p);
 
             foreach (var prop in p.Properties)
             {
                 var mi = prop.GetMemberInfo();
-                if (mi != null && propertyConfiguration.TryGetValue(mi, out var propertyConfig))
+                if (mi != null && memberProperties.TryGetValue(mi, out var propertyConfig))
                     propertyConfig(prop);
             }
         };

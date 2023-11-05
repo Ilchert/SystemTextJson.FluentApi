@@ -1,8 +1,18 @@
-﻿using System.Text.Json.Serialization.Metadata;
+using System.Text.Json.Serialization.Metadata;
 
 namespace SystemTextJson.FluentApi;
 
-internal interface IPropertyBuilder
+public interface IPropertyBuilder
 {
-    Action<JsonPropertyInfo> Build();
+    string Name { get; }
+
+    IList<Action<JsonPropertyInfo>> JsonPropertyInfoActions { get; }
+
+    IEntityTypeBuilder EntityTypeBuilder { get; }
+
+    internal Action<JsonPropertyInfo> Build();
+}
+public interface IPropertyBuilder<TEntity, TProperty> : IPropertyBuilder
+{
+    new IEntityTypeBuilder<TEntity> EntityTypeBuilder { get; }
 }
