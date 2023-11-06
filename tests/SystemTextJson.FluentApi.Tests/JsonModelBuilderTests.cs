@@ -44,6 +44,40 @@ public class JsonModelBuilderTests
         JsonAsserts.AssertObject(new TestClass(), "{}", _options);
     }
 
+    [Fact]
+    public void TrackChangedProperties()
+    {
+        _options.ConfigureDefaultTypeResolver(builder => builder.TrackChangedProperties());
+
+        var obj = JsonSerializer.Deserialize<TrackTestClass>("""{"StringProperty":"str", "IntProperty":1}""", _options);
+
+        Assert.NotNull(obj);
+        Assert.Contains(nameof(TrackTestClass.IntProperty), obj.ChangedProperties);
+        Assert.Contains(nameof(TrackTestClass.StringProperty), obj.ChangedProperties);
+    }
+
+    [Fact]
+    public void SerializeOnlyChangedProperties()
+    {
+        _options.ConfigureDefaultTypeResolver(builder => builder.SerializeOnlyChangedProperties());
+
+        var testObject = new TrackTestClass()
+        {
+            StringProperty = "str",
+            IntProperty = 1,
+            ChangedProperties = { nameof(TrackTestClass.IntProperty) }
+        };
+
+        JsonAsserts.AssertJson(testObject, """{"IntProperty":1}""", _options);
+    }
+
+    public class TrackTestClass : IHaveChangedProperties
+    {
+        public string? StringProperty { get; set; }
+        public int IntProperty { get; set; }
+        public ISet<string> ChangedProperties { get; } = new HashSet<string>();
+    }
+
     public class TestClass
     {
         [JsonPropertyName("Pro")]

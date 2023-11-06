@@ -6,9 +6,9 @@ public interface IPropertyBuilder
 {
     string Name { get; }
 
-    IList<Action<JsonPropertyInfo>> JsonPropertyInfoActions { get; }
+    internal IList<Action<JsonPropertyInfo>> JsonPropertyInfoActions { get; }
 
-    IEntityTypeBuilder EntityTypeBuilder { get; }
+    internal IEntityTypeBuilder EntityTypeBuilder { get; }
 
     internal Action<JsonPropertyInfo> Build();
 }

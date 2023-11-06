@@ -59,12 +59,9 @@ public class MemberPropertyBuilder<TEntity, TProperty>(MemberInfo memberInfo, IE
         return this;
     }
 
-    public MemberPropertyBuilder<TEntity, TProperty> SerializeAsObject()
-    {
+    public MemberPropertyBuilder<TEntity, TProperty> SerializeAsObject() =>
         this.Configure(p => p.CustomConverter = ObjectSerializer<TProperty>.Instance);
-        return this;
-    }
-    
+
     Action<JsonPropertyInfo> IPropertyBuilder.Build()
     {
         var configurations = JsonPropertyInfoActions.ToArray();

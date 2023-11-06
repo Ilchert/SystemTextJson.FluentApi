@@ -159,10 +159,42 @@ class Person
 
 ```
 
-Serialization of `testObject` collection will produce:
+Serialization of `testObject` will produce:
 
 ```JSON
 {
     "FullName": "First name Last name"
 }
 ```
+
+# Change tracking
+
+Fluent Api can track changes during serialization and deserialization. If some entity implement `IHaveChnagedProperties` interface with not null `ChangedProperties` property, it will be used to track changes. To populate property/field names that set deserialization use `TrackChangedProperties()` method. To serialize properties only from `ChangedProperties` use `SerializeOnlyChangedProperties()`. This method will override `JsonIgnoreCondition`.
+
+```C#
+builder.TrackChangedProperties().SerializeOnlyChangedProperties();
+
+var testObject = new TrackTestClass()
+{
+    StringProperty = "str",
+    IntProperty = 1,
+    ChangedProperties = { nameof(TrackTestClass.IntProperty) }
+};
+
+public class TrackTestClass : IHaveChangedProperties
+{
+    public string? StringProperty { get; set; }
+    public int IntProperty { get; set; }
+    public ISet<string> ChangedProperties { get; } = new HashSet<string>();
+}
+
+```
+
+Serialization of `testObject` will produce:
+
+```JSON
+{
+    "IntProperty": 1
+}
+```
+And deserialization of this JSON will populate `"IntProperty"` value to `ChangedProperties`.

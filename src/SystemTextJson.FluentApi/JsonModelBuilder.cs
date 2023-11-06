@@ -25,6 +25,82 @@ public sealed class JsonModelBuilder
         return this;
     }
 
+    public JsonModelBuilder TrackChangedProperties()
+    {
+        Configure(p =>
+        {
+            if (!typeof(IHaveChangedProperties).IsAssignableFrom(p.Type))
+                return;
+
+            for (var i = 0; i < p.Properties.Count; i++)
+            {
+                var property = p.Properties[i];
+                if (property.GetMemberInfo() is not { } mi)
+                    continue;
+
+                if (mi.Name == nameof(IHaveChangedProperties.ChangedProperties))
+                {
+                    p.Properties.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+
+                if (property.Set is not { } set)
+                    continue;
+
+                var realPropertyName = mi.Name;
+
+                property.Set = (o, value) =>
+                {
+                    var cp = o as IHaveChangedProperties;
+                    cp?.ChangedProperties?.Add(realPropertyName);
+                    set(o, value);
+                };
+            }
+        });
+
+
+        return this;
+    }
+
+    public JsonModelBuilder SerializeOnlyChangedProperties()
+    {
+        Configure(p =>
+        {
+            if (!typeof(IHaveChangedProperties).IsAssignableFrom(p.Type))
+                return;
+
+            for (var i = 0; i < p.Properties.Count; i++)
+            {
+                var property = p.Properties[i];
+                if (property.GetMemberInfo() is not { } mi)
+                    continue;
+
+                if (mi.Name == nameof(IHaveChangedProperties.ChangedProperties))
+                {
+                    p.Properties.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+
+                if (property.Get is not { })
+                    continue;
+
+                var realPropertyName = mi.Name;
+
+                property.ShouldSerialize = (o, value) =>
+                {
+                    var cp = o as IHaveChangedProperties;
+                    return cp?.ChangedProperties?.Contains(realPropertyName) == true;
+                };
+            }
+        });
+
+
+        return this;
+    }
+
+
 #if NET6_0_OR_GREATER
 
     public JsonModelBuilder RespectNullableReferenceType()

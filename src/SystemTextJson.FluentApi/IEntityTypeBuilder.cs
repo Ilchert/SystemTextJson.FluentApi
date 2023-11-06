@@ -6,9 +6,9 @@ namespace SystemTextJson.FluentApi;
 public interface IEntityTypeBuilder
 {
     Type EntityType { get; }
-    IList<Action<JsonTypeInfo>> JsonTypeInfoActions { get; }
+    internal IList<Action<JsonTypeInfo>> JsonTypeInfoActions { get; }
 
-    IList<IPropertyBuilder> PropertyBuilders { get; }
+    internal IList<IPropertyBuilder> PropertyBuilders { get; }
 
     JsonModelBuilder ModelBuilder { get; }
 
