@@ -1,5 +1,6 @@
 [![NuGet](https://buildstats.info/nuget/SystemTextJson.FluentApi)](https://www.nuget.org/packages/SystemTextJson.FluentApi/ "Download SystemTextJson.FluentApi from NuGet.org")
 WARNING: this package is under active development so the api may change at any time.
+Normally you do not need to use this package and just copy paste required functionality like NRT or polymorphism support.
 # SystemTextJson.FluentApi
 SystemTextJson.FluentApi is a fluent configuration library for System.Text.Json that allows developers to configure serialization uses strongly typed fluent interface and lambda expression.
 
@@ -89,12 +90,10 @@ Serialization of `testObject` collection will produce:
 ]
 ```
 
-With `$type` discriminator serializer are able to deserialize this collection. Another approach to serialization is use actual type from object instance, instead of property type. To achieve this behavior serializer can threat specific type as `object`. Fluent Api has two way for this - configure behavior for specific property with `PropertyBuilder.SerializeAsObject` or for specific type with `JsonSerializerOptionsExtensions.SerializeAsObject`.
+With `$type` discriminator serializer are able to deserialize this collection. Another approach to serialization is use actual type from object instance, instead of property type. To achieve this behavior serializer can threat specific property as `object` using `PropertyBuilder.SerializeAsObject`.
 
 ```C#
 builder.Entity<AsObjectTestClass>().Property(p => p.Data).SerializeAsObject();
-// or 
-options.SerializeAsObject<Root>();
 
 var testObject = new AsObjectTestClass { Data = new Derived() { Property = "Prop" } };
 
