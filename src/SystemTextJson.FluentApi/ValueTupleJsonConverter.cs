@@ -54,7 +54,7 @@ public class ValueTupleJsonConverter : JsonConverterFactory
 
             if (reader.TokenType != JsonTokenType.EndArray)
                 throw new JsonException("Expected end token ']'.");
-
+            
             return result;
         }
 
