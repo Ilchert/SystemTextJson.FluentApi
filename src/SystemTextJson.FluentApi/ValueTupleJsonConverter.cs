@@ -6,7 +6,7 @@ public class ValueTupleJsonConverter : JsonConverterFactory
 {
     public override bool CanConvert(Type typeToConvert)
     {
-        if (!typeToConvert.IsClass &&
+        return !typeToConvert.IsClass &&
             typeToConvert.IsGenericType &&
             typeToConvert.GetGenericTypeDefinition() is { } genericType &&
             (
@@ -19,9 +19,7 @@ public class ValueTupleJsonConverter : JsonConverterFactory
             genericType == typeof(ValueTuple<,,,,,,>) ||
             genericType == typeof(ValueTuple<,,,,,,,>) ||
             genericType == typeof(ValueTuple<,,,,,,,>)
-            ))
-            return true;
-        return false;
+            );
     }
 
     public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
@@ -42,62 +40,52 @@ public class ValueTupleJsonConverter : JsonConverterFactory
         return (JsonConverter?)Activator.CreateInstance(converterType.MakeGenericType(typeToConvert.GenericTypeArguments));
     }
 
-    private static void EnsureStartArray(ref Utf8JsonReader reader)
+    private abstract class TupleConverterBase<TTuple> : JsonConverter<TTuple>
+        where TTuple : struct
     {
-        if (reader.TokenType != JsonTokenType.StartArray)
-            throw new JsonException("Start token must be '['.");
-    }
-
-    private static void EnsureEndArray(ref Utf8JsonReader reader)
-    {
-        if (reader.TokenType != JsonTokenType.EndArray)
-            throw new JsonException("Expected end token '['.");
-    }
-
-    private static T? ReadValue<T>(ref Utf8JsonReader reader, JsonSerializerOptions options)
-    {
-        var converter = (JsonConverter<T>)options.GetConverter(typeof(T));
-        var value = converter.Read(ref reader, typeof(T), options);
-        reader.Read();
-        return value;
-    }
-
-    private static void WriteValue<T>(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
-    {
-        var converter = (JsonConverter<T?>)options.GetConverter(typeof(T));
-
-        if (value is null && !converter.HandleNull)
-            writer.WriteNullValue();
-        else
-            converter.Write(writer, value, options);
-    }
-
-    private abstract class TupleConverterBase<T> : JsonConverter<T>
-        where T : struct
-    {
-        public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override TTuple Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            EnsureStartArray(ref reader);
+            if (reader.TokenType != JsonTokenType.StartArray)
+                throw new JsonException("Start token must be '['.");
 
             reader.Read();
 
             var result = ReadTuple(ref reader, typeToConvert, options);
 
-            EnsureEndArray(ref reader);
+            if (reader.TokenType != JsonTokenType.EndArray)
+                throw new JsonException("Expected end token ']'.");
 
             return result;
         }
 
-        protected internal abstract T ReadTuple(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options);
+        protected static T? ReadValue<T>(ref Utf8JsonReader reader, JsonSerializerOptions options)
+        {
+            var converter = (JsonConverter<T>)options.GetConverter(typeof(T));
+            var value = converter.Read(ref reader, typeof(T), options);
+            reader.Read();
+            return value;
+        }
+        
+        protected internal abstract TTuple ReadTuple(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options);
 
-        public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, TTuple value, JsonSerializerOptions options)
         {
             writer.WriteStartArray();
             WriteTuple(writer, value, options);
             writer.WriteEndArray();
         }
 
-        protected internal abstract void WriteTuple(Utf8JsonWriter writer, T value, JsonSerializerOptions options);
+        protected internal abstract void WriteTuple(Utf8JsonWriter writer, TTuple value, JsonSerializerOptions options);
+
+        protected static void WriteValue<T>(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
+        {
+            var converter = (JsonConverter<T?>)options.GetConverter(typeof(T));
+
+            if (value is null && !converter.HandleNull)
+                writer.WriteNullValue();
+            else
+                converter.Write(writer, value, options);
+        }
     }
 
     private class ValueTupleConverter<T1> : TupleConverterBase<ValueTuple<T1?>>
