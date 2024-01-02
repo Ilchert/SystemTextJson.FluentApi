@@ -197,3 +197,18 @@ Serialization of `testObject` will produce:
 }
 ```
 And deserialization of this JSON will populate `"IntProperty"` value to `ChangedProperties`.
+
+# ValueTuple serialization
+
+Fluent Api has `ValueTupleJsonConverter` to serialize and deserialize `ValueTuple` as array. 
+
+```C#
+var options = new JsonSerializerOptions() { Converters = { new ValueTupleJsonConverter() } };
+JsonSerializer.Serialize((1,"str"),options);
+```
+
+This code output:
+
+```JSON
+[1,"str"]
+```

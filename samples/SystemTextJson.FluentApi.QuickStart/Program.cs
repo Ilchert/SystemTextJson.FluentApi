@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using SystemTextJson.FluentApi;
 
-var options = new JsonSerializerOptions() { WriteIndented = true };
+var options = new JsonSerializerOptions() { WriteIndented = true, Converters = { new ValueTupleJsonConverter() } };
 options.ConfigureDefaultTypeResolver(p =>
 p.Entity<Person>()
 .Property(p => p.LastName).HasName("surname")
@@ -15,6 +15,9 @@ var person = new Person() { FirstName = "First name", LastName = "Last name", Ag
 var json = JsonSerializer.Serialize(person, options);
 
 Console.WriteLine(json);
+
+var tupleJson = JsonSerializer.Serialize((1,"str"),options);
+Console.WriteLine(tupleJson);
 
 class Person
 {
