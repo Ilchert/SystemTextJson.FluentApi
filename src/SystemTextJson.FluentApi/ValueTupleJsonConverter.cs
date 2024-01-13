@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
+using static SystemTextJson.FluentApi.SerializationHelpers;
 namespace SystemTextJson.FluentApi;
 public class ValueTupleJsonConverter : JsonConverterFactory
 {
@@ -58,22 +58,6 @@ public class ValueTupleJsonConverter : JsonConverterFactory
             return result;
         }
 
-        protected static T? ReadValue<T>(JsonConverter<T?> converter, ref Utf8JsonReader reader, JsonSerializerOptions options)
-        {
-            var value = default(T);
-            if (reader.TokenType == JsonTokenType.Null && !converter.HandleNull)
-            {
-                if (value is not null)
-                    throw new JsonException("Expected not null value.");
-            }
-            else
-            {
-                value = converter.Read(ref reader, typeof(T), options);
-            }
-            reader.Read();
-            return value;
-        }
-
         protected internal abstract TTuple ReadTuple(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options);
 
         public override void Write(Utf8JsonWriter writer, TTuple value, JsonSerializerOptions options)
@@ -84,14 +68,6 @@ public class ValueTupleJsonConverter : JsonConverterFactory
         }
 
         protected internal abstract void WriteTuple(Utf8JsonWriter writer, TTuple value, JsonSerializerOptions options);
-
-        protected static void WriteValue<T>(JsonConverter<T?> converter, Utf8JsonWriter writer, T value, JsonSerializerOptions options)
-        {
-            if (value is null && !converter.HandleNull)
-                writer.WriteNullValue();
-            else
-                converter.Write(writer, value, options);
-        }
     }
 
     private class ValueTupleConverter<T1>(JsonSerializerOptions options) : ValueTupleConverterBase<ValueTuple<T1?>>
