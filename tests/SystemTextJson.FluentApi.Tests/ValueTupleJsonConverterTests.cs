@@ -89,6 +89,23 @@ public class ValueTupleJsonConverterTests
         Assert.True(isEquals, "Json not equal.");
     }
 
+    [Theory]
+    [MemberData(nameof(Data))]
+    public void ReadJsonFromArray<T>(T expected, string json)
+    {
+        var actual = JsonSerializer.Deserialize<T[]>($"[{json}]", _options);
+        Assert.Equivalent((T[])[expected], actual);
+    }
+
+    [Theory]
+    [MemberData(nameof(Data))]
+    public void WriteJsonFromArray<T>(T value, string expected)
+    {
+        var actual = JsonSerializer.Serialize<T[]>([value], _options);
+        var isEquals = JsonNode.DeepEquals(JsonNode.Parse($"[{expected}]"), JsonNode.Parse(actual));
+        Assert.True(isEquals, "Json not equal.");
+    }
+
     private class EmptyDto();
 
     private class Dto<T>
