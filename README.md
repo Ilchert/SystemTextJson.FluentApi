@@ -213,7 +213,7 @@ This code output:
 [1,"str"]
 ```
 
-#Inline arrays support
+# Inline arrays support
 
 Fluent Api has `InlineArrayJsonConverter` for .NET 8 and above to serialize and deserialize [`InlineArray`](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-12.0/inline-arrays) structs as arrays.
 
