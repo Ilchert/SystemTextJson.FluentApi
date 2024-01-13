@@ -212,3 +212,25 @@ This code output:
 ```JSON
 [1,"str"]
 ```
+
+#Inline arrays support
+
+Fluent Api has `InlineArrayJsonConverter` for .NET 8 and above to serialize and deserialize [`InlineArray`](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-12.0/inline-arrays) structs as arrays.
+
+```C#
+var array = new InlineArray();
+array[0] = null;
+array[1] = 1;
+array[2] = -1;
+var options = new JsonSerializerOptions() { Converters = { new InlineArrayJsonConverter() } };
+JsonSerializer.Serialize(array,options);
+
+[InlineArray(3)]
+private struct InlineArray
+{
+    public int? Value;
+}
+```
+ 
+Output: `"[null,1,-1]"`
+
