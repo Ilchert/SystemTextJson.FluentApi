@@ -234,3 +234,27 @@ private struct InlineArray
  
 Output: `"[null,1,-1]"`
 
+# Enum with JsonPropertyName attributes
+
+Default [JsonStringEnumConverter](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.serialization.jsonstringenumconverter) does not respect `JsonPropertyNameAttribute`, to fix use CustomizableJsonStringEnumConverter instead.
+
+```C#
+
+var options = new JsonSerializerOptions() { Converters = { new CustomizableJsonStringEnumConverter(JsonNamingPolicy.CamelCase) } };
+
+JsonSerializer.Serialize<A?[]>([A.First, null, A.Third, (A)8], _options);
+
+enum A
+{
+    [JsonPropertyName("f")]
+    First,
+    Second,
+    Third
+}
+
+```
+
+Output:
+```JS
+["f",null,"third",8]
+```
