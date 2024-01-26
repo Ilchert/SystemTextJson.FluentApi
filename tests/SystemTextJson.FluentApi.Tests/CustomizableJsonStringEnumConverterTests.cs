@@ -5,9 +5,9 @@ using Xunit;
 
 namespace SystemTextJson.FluentApi.Tests;
 
-public class CustomJsonStringEnumConverterTests
+public class CustomizableJsonStringEnumConverterTests
 {
-    JsonSerializerOptions _options = new JsonSerializerOptions() { Converters = { new CustomJsonStringEnumConverter(JsonNamingPolicy.CamelCase) } };
+    JsonSerializerOptions _options = new JsonSerializerOptions() { Converters = { new CustomizableJsonStringEnumConverter(JsonNamingPolicy.CamelCase) } };
 
     [Fact]
     public void Write()

@@ -8,13 +8,13 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace SystemTextJson.FluentApi;
-public class CustomJsonStringEnumConverter : JsonConverterFactory
+public class CustomizableJsonStringEnumConverter : JsonConverterFactory
 {
     private JsonStringEnumConverter _defaultConverter;
-    public CustomJsonStringEnumConverter() =>
+    public CustomizableJsonStringEnumConverter() =>
         _defaultConverter = new JsonStringEnumConverter();
 
-    public CustomJsonStringEnumConverter(JsonNamingPolicy? namingPolicy = null, bool allowIntegerValues = true) =>
+    public CustomizableJsonStringEnumConverter(JsonNamingPolicy? namingPolicy = null, bool allowIntegerValues = true) =>
         _defaultConverter = new JsonStringEnumConverter(namingPolicy, allowIntegerValues);
 
     public override bool CanConvert(Type typeToConvert) =>
