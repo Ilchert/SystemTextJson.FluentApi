@@ -236,7 +236,7 @@ Output: `"[null,1,-1]"`
 
 # Enum with JsonPropertyName attributes
 
-Default [JsonStringEnumConverter](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.serialization.jsonstringenumconverter) does not respect `JsonPropertyNameAttribute`, to fix use CustomizableJsonStringEnumConverter instead.
+Default [JsonStringEnumConverter](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.serialization.jsonstringenumconverter) does not respect `JsonPropertyNameAttribute`, to fix it use CustomizableJsonStringEnumConverter instead.
 
 ```C#
 
@@ -251,7 +251,6 @@ enum A
     Second,
     Third
 }
-
 ```
 
 Output:
