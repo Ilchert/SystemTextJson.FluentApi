@@ -2,5 +2,7 @@
 	<PropertyGroup>
 		<UseArtifactsOutput>true</UseArtifactsOutput>
 		<IsPackable>false</IsPackable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <Nullable>enable</Nullable>
 	</PropertyGroup>
 </Project>
