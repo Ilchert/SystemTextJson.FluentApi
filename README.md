@@ -239,9 +239,12 @@ Output: `"[null,1,-1]"`
 Default [JsonStringEnumConverter](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.serialization.jsonstringenumconverter) does not respect `JsonPropertyNameAttribute`, to fix it use CustomizableJsonStringEnumConverter instead.
 
 ```C#
-
+// set globally
 var options = new JsonSerializerOptions() { Converters = { new CustomizableJsonStringEnumConverter(JsonNamingPolicy.CamelCase) } };
-
+// or for scpecific enum
+var options = new JsonSerializerOptions().ConfigureEnumValues(
+        new Dictionary<A, string> { { A.First, "f" } },
+        namingPolicy: JsonNamingPolicy.CamelCase);
 JsonSerializer.Serialize<A?[]>([A.First, null, A.Third, (A)8], _options);
 
 enum A
